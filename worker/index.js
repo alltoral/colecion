@@ -41,6 +41,54 @@ async function chat(env, model, messages, maxTokens = 700) {
   return out?.response ?? out;
 }
 
+
+/* ---------- Claude (principal, quando ANTHROPIC_API_KEY existir) ---------- */
+const CLAUDE_MODEL = "claude-sonnet-5-5";
+
+async function claudeFicha(env, prompt, image) {
+  const content = [];
+  if (image) {
+    const m = image.match(/^data:(image\/[a-z+]+);base64,(.+)$/);
+    if (m) content.push({ type: "image", source: { type: "base64", media_type: m[1], data: m[2] } });
+  }
+  content.push({
+    type: "text",
+    text: `${prompt}
+
+Como trabalhar:
+1. ${image ? "Olhe a foto com atenção: formato da carroceria, detalhes, rodas, pintura, decoração e qualquer texto na mini, na base ou na cartela." : "Use a descrição do dono."}
+2. Pesquise na internet (Hot Wheels Wiki, Matchbox Wiki, sites de colecionadores) para confirmar o nome oficial da miniatura (casting), a série/linha e o ano dessa versão com essa pintura.
+3. Responda no final SOMENTE com o objeto JSON pedido, acrescentando a chave "fonte" com o nome do site principal usado (ou null).`,
+  });
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": env.ANTHROPIC_API_KEY,
+      "anthropic-version": "2023-06-01",
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      model: env.CLAUDE_MODEL || CLAUDE_MODEL,
+      max_tokens: 1500,
+      system: "Você é um especialista em miniaturas colecionáveis 1:64 (Hot Wheels, Matchbox, Majorette, Maisto, Tomica, Mini GT). Identifica modelos pela foto e confirma dados pesquisando na internet.",
+      tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 4 }],
+      messages: [{ role: "user", content }],
+    }),
+  });
+  if (r.status === 429) throw new Error("rate limit");
+  if (!r.ok) throw new Error("claude " + r.status + " " + (await r.text()).slice(0, 300));
+  const j = await r.json();
+  const text = (j.content || []).filter((b) => b.type === "text").map((b) => b.text).join("\n");
+  // pega o último objeto JSON válido do texto (a resposta final vem depois das pesquisas)
+  let data = null;
+  for (let i = text.lastIndexOf("{"); i >= 0 && !data; i = i > 0 ? text.lastIndexOf("{", i - 1) : -1) {
+    const end = text.lastIndexOf("}");
+    if (end > i) { try { data = JSON.parse(text.slice(i, end + 1)); } catch {} }
+  }
+  return data;
+}
+
+/* ---------- Reserva: Workers AI + wiki ---------- */
 /* ---------- 1. identificar ---------- */
 const IDENT_PROMPT = `Analise a miniatura colecionável de carro (escala 1:64) e responda SOMENTE com um JSON com estas chaves:
 "marca_miniatura" (fabricante da miniatura, ex. Hot Wheels, Matchbox, Majorette, Maisto, Tomica, Mini GT; null se não der para saber),
@@ -166,7 +214,7 @@ Instruções:
 }
 
 async function handleFicha(request, env) {
-  if (!env.AI) return json({ erro: "IA não configurada neste Worker" }, 503);
+  if (!env.AI && !env.ANTHROPIC_API_KEY) return json({ erro: "IA não configurada neste Worker" }, 503);
   let body;
   try {
     body = await request.json();
@@ -178,6 +226,15 @@ async function handleFicha(request, env) {
   if (!prompt) return json({ erro: "Faltou a descrição" }, 400);
   if (image && image.length > MAX_IMAGE_CHARS) return json({ erro: "Foto grande demais" }, 413);
 
+  if (env.ANTHROPIC_API_KEY) {
+    try {
+      const data = await claudeFicha(env, prompt, image);
+      if (data && Object.keys(data).length) return json(data);
+    } catch (err) {
+      if (/rate limit/i.test(String(err && err.message))) return json({ erro: "Muitas consultas seguidas" }, 429);
+      console.log("Claude falhou, usando reserva:", String(err && err.message));
+    }
+  }
   try {
     const ident = await identify(env, prompt, image);
     let found = null;
@@ -198,7 +255,7 @@ async function handleFicha(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.pathname === "/api/ping") return json({ ok: true, ia: Boolean(env.AI), pesquisa: true });
+    if (url.pathname === "/api/ping") return json({ ok: true, ia: Boolean(env.AI || env.ANTHROPIC_API_KEY), motor: env.ANTHROPIC_API_KEY ? "claude" : "workers-ai" });
     if (url.pathname === "/api/ficha") {
       if (request.method !== "POST") return json({ erro: "Use POST" }, 405);
       return handleFicha(request, env);
