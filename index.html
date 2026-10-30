@@ -25,7 +25,7 @@ html{padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
   --z-dark:#3A6604;--z-mid:#65B307;--z-lime:#A4EA4F;--z-deep:#12210a;
   --z-grad:linear-gradient(to right,var(--z-dark),var(--z-lime));
   --z-grad-diag:linear-gradient(160deg,var(--z-dark),var(--z-mid) 55%,var(--z-lime));
-  --wish:#ff2d87;--wish-deep:#7a1340;--wish-tint:#ffe3ef;
+  --wish:#ff6a00;--wish-deep:#8a2c00;--wish-tint:#ffe6d1;
   --wallc:#dfe9d4;--ink:#141219;--yellow:#ffe100;--noise:none;
   --r-lg:22px;--r-md:14px;--r-sm:9px;
   --f-ui:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -58,7 +58,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ttl{min-width:0;flex:1;display:grid;line-height:1.1}
 .ttl small{font-size:11px;font-weight:700;opacity:.8;letter-spacing:.04em;text-transform:uppercase}
 .ttl b{font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wishbtn{background:var(--wish);box-shadow:0 2px 8px rgba(122,19,64,.35)}
+.wishbtn{background:var(--wish);box-shadow:0 2px 8px rgba(138,44,0,.35)}
 .wishbtn i{font-style:normal;font-size:12px;font-weight:800;background:rgba(255,255,255,.25);border-radius:9px;padding:1px 7px}
 .addmini{background:#fff;color:var(--z-dark)}
 @media (max-width:420px){.ib .lbl{display:none}}
@@ -96,7 +96,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ditem[aria-current="page"] .n{color:#d9ecc6}
 .ditem .bico{width:26px;height:26px;border-radius:8px;flex:none;background:linear-gradient(135deg,var(--a) 55%,var(--b) 55%)}
 .ditem .wico{width:26px;height:26px;border-radius:8px;flex:none;display:grid;place-items:center;background:var(--z-grad);color:#fff}
-.dwish{margin-top:14px;display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;text-decoration:none;color:#fff;background:linear-gradient(140deg,var(--wish-deep),var(--wish) 70%,#ff8ac0);box-shadow:0 8px 18px -8px rgba(122,19,64,.6)}
+.dwish{margin-top:14px;display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;text-decoration:none;color:#fff;background:linear-gradient(140deg,var(--wish-deep),var(--wish) 70%,#ffa24a);box-shadow:0 8px 18px -8px rgba(138,44,0,.6)}
 .dwish svg{width:30px;height:30px;flex:none}
 .dwish b{display:block;font-size:16px}
 .dwish span{font-size:12.5px;opacity:.9}
@@ -113,7 +113,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 .banner.brand{background:var(--a);color:var(--ink2)}
 .banner.brand::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-55deg,transparent 0 22px,var(--b) 22px 36px);clip-path:polygon(64% 0,100% 0,100% 100%,48% 100%)}
-.banner.wish{background:linear-gradient(140deg,var(--wish-deep),var(--wish) 70%,#ff8ac0)}
+.banner.wish{background:linear-gradient(140deg,var(--wish-deep),var(--wish) 70%,#ffa24a)}
 .banner.has-img{aspect-ratio:16/6;min-height:0;background-size:cover!important;background-position:center 68%!important;color:#fff}
 .banner.has-img::before{display:none}
 .banner.has-img h1{text-shadow:0 2px 14px rgba(0,0,0,.6)}
@@ -137,7 +137,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .plaque::before{left:20px;transform:rotate(14deg)}.plaque::after{right:20px;transform:rotate(-14deg)}
 .plaque h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:17px;color:var(--z-lime)}
 .plaque span{font-size:12.5px;font-weight:600;color:#cfe3bd}
-.plaque.wishp{background:var(--wish-deep)}.plaque.wishp h2{color:#ffc2dc}
+.plaque.wishp{background:var(--wish-deep)}.plaque.wishp h2{color:#ffd2a8}
 .empty{background:rgba(255,255,255,.92);border-radius:var(--r-lg);padding:20px;font-size:15px;line-height:1.45;max-width:480px;display:grid;gap:10px;justify-items:start}
 .empty b{font-size:18px}
 .ebtn{height:40px;padding:0 16px;border-radius:12px;border:none;background:var(--z-accent);color:#fff;font-weight:800}
@@ -454,7 +454,7 @@ let fitT;window.addEventListener("resize",()=>{clearTimeout(fitT);fitT=setTimeou
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>fitNames());
 function faceHTML(c){
   const p=palette(c),cs=CONS.find(s=>s[0]===c.conservacao),ph=photoOf(c);
-  const stick=c.status==="desejo"?["QUERO","#ffc2dc"]:null,tag=stOf(c)==="detalhar"?["DETALHAR","#ffe100"]:stOf(c)==="reformar"?["REFORMAR","#ff9a3c"]:null;
+  const stick=c.status==="desejo"?["QUERO","#ffd2a8"]:null,tag=stOf(c)==="detalhar"?["DETALHAR","#ffe100"]:stOf(c)==="reformar"?["REFORMAR","#ff9a3c"]:null;
   return `<div class="face" style="--c:${p.c};--on:${p.on};--band:${p.band};--bandon:${p.bandon};--ns:${nameSize(c.nome)}">
     <div class="band"><span class="slot"></span><p class="cname"><span>${esc(c.nome||"Sem nome")}</span></p></div>
     <div class="win">${ph?`<img data-for="${esc(c.id)}" class="${ph.raw?"raw":""}" src="${ph.src}" alt="" draggable="false">`:SIL}
@@ -524,7 +524,7 @@ function wallTint(){
   if(fNeutral)return "#dcdde2";
   if(fHue!=null)return hsl2hex(fHue,.55,.84);
   const b=currentBrand();if(b)return `color-mix(in srgb, ${brandColors(b)[0]} 20%, #ffffff)`;
-  if(route==="wishlist")return "#f8dbe8";
+  if(route==="wishlist")return "#fde2cb";
   return "#dfe9d4";
 }
 function matchColor(c){if(!fNeutral&&fHue==null)return true;const [h,s]=hslOf(baseHex(c));if(fNeutral)return s<.18;if(s<.18)return false;return Math.min(Math.abs(h-fHue),360-Math.abs(h-fHue))<=22}
@@ -674,7 +674,7 @@ async function runAI(input,img,btn){
   if(!sample&&!remoteAI){aiMsg("O assistente de IA não está disponível neste endereço.",true);return}
   const prev=btn.innerHTML;btn.disabled=true;btn.textContent="Pensando…";aiMsg("A IA está analisando…");
   try{const r=await askAI(input,img);const n=applyAI(r);
-    aiMsg(n?`Preenchi ${n} campos. Confira e ajuste o que precisar.`:"Não consegui identificar. Tente descrever com mais detalhes.")}
+    aiMsg(n?`Preenchi ${n} campos${r&&r.fonte?` com base na ${r.fonte}`:""}. Confira e ajuste o que precisar.`:"Não consegui identificar. Tente descrever com mais detalhes.")}
   catch(e){aiMsg(e&&e.code==="not_granted"?"Permita o uso do Claude nesta página para ativar o assistente.":e&&e.code==="rate_limited"?"Muitas consultas seguidas. Espere alguns segundos.":"A IA não respondeu agora. Tente de novo.",true)}
   btn.innerHTML=prev;btn.disabled=false;if(btn.id==="aiPhoto")btn.disabled=!photo;
 }

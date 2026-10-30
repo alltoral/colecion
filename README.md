@@ -12,7 +12,7 @@ Funciona como site e como aplicativo instalável (PWA) no celular e no computado
 2. Deixe o comando de deploy como `npx wrangler deploy` (a configuração está em `wrangler.jsonc`).
 3. Ao terminar, o app fica em `https://colecion.SEU-SUBDOMINIO.workers.dev`. Cada push na branch `main` publica de novo.
 
-O que a IA faz: lê a foto (ou o que você falou/digitou) e devolve nome, marca, série, ano, cor, tipo, status e conservação. Modelos usados: `llama-4-scout` para foto e `llama-3.3-70b` para texto, definidos no topo de `worker/index.js`.
+O que a IA faz: identifica o carrinho pela foto (ou pelo que você falou/digitou), pesquisa o modelo na wiki da marca (Hot Wheels Wiki ou Matchbox Wiki) e devolve nome oficial, marca, série, ano, cor, tipo, status e conservação. Modelos usados: `llama-4-scout` para foto e `llama-3.3-70b` para texto, definidos no topo de `worker/index.js`.
 
 ## Publicar no GitHub Pages (sem IA)
 
