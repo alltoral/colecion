@@ -4,7 +4,17 @@ Catálogo pessoal de carrinhos colecionáveis (Hot Wheels, Matchbox, Majorette, 
 
 Funciona como site e como aplicativo instalável (PWA) no celular e no computador.
 
-## Publicar no GitHub Pages
+## Publicar no Cloudflare Workers (com IA)
+
+É o jeito recomendado: o mesmo Worker serve o app e a rota de IA `/api/ficha`, que usa o **Workers AI** do próprio Cloudflare (sem chave de API separada).
+
+1. No painel do Cloudflare, vá em **Workers & Pages → Create → Import a repository** e escolha `alltoral/colecion`.
+2. Deixe o comando de deploy como `npx wrangler deploy` (a configuração está em `wrangler.jsonc`).
+3. Ao terminar, o app fica em `https://colecion.SEU-SUBDOMINIO.workers.dev`. Cada push na branch `main` publica de novo.
+
+O que a IA faz: lê a foto (ou o que você falou/digitou) e devolve nome, marca, série, ano, cor, tipo, status e conservação. Modelos usados: `llama-4-scout` para foto e `llama-3.3-70b` para texto, definidos no topo de `worker/index.js`.
+
+## Publicar no GitHub Pages (sem IA)
 
 1. O código já está neste repositório (`alltoral/colecion`).
 2. No GitHub, vá em **Settings → Pages**, escolha **Deploy from a branch**, branch `main`, pasta `/ (root)`.
@@ -23,12 +33,14 @@ Depois de instalado, o app abre em tela cheia e funciona sem internet.
 - **App instalado / GitHub Pages:** a coleção fica salva no próprio aparelho (IndexedDB). Use **Menu → Salvar cópia de segurança** de vez em quando, e **Restaurar cópia** para levar a coleção para outro aparelho.
 - **Dentro do Claude:** a coleção fica sincronizada na nuvem do Claude e o assistente de IA (identificar pela foto, preencher por voz ou texto) fica ativo.
 
-> O assistente de IA usa o Claude e por isso só funciona na versão aberta dentro do Claude. Para ter IA e sincronização entre aparelhos na versão do GitHub, o próximo passo é ligar um backend (por exemplo Supabase ou Firebase para os dados, e uma função serverless com a API da Anthropic para a IA).
+> O assistente de IA funciona dentro do Claude e na versão publicada no Cloudflare. No GitHub Pages ele fica oculto, porque o Pages não executa a rota de IA.
 
 ## Estrutura
 
 ```
 index.html              o app inteiro (HTML, CSS e JS)
+worker/index.js         Worker do Cloudflare: serve o app e a IA (/api/ficha)
+wrangler.jsonc          configuração do Cloudflare
 manifest.webmanifest    dados para instalar como app
 sw.js                   cache offline
 icons/                  ícones do app

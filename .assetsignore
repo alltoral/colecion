@@ -1,0 +1,10 @@
+.git/
+.github/
+worker/
+wrangler.jsonc
+wrangler.toml
+node_modules/
+.wrangler/
+.assetsignore
+README.md
+banners/README.md

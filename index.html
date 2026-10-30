@@ -646,7 +646,15 @@ let tt;function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clea
 function aiMsg(m,err){const el=$("#aiMsg");el.textContent=m;el.classList.toggle("err",!!err)}
 
 /* ---------- IA (ativa quando o app roda dentro do Claude) ---------- */
-let sample=null,aiImages=false;
+let sample=null,aiImages=false,remoteAI=false;
+/* IA: dentro do Claude usa o Claude; no Cloudflare usa a rota /api/ficha (Workers AI) */
+async function askAI(input,img){
+  if(sample)return sample.json(input,img?{images:[dataUrlToBlob(img)],modelTier:"default"}:{modelTier:"quick"});
+  const r=await fetch("api/ficha",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({prompt:input,image:img||null})});
+  if(r.status===429)throw {code:"rate_limited"};
+  if(!r.ok)throw {code:"remote"};
+  return r.json();
+}
 const AI_RULES=`Você ajuda a catalogar miniaturas colecionáveis de carros (Hot Wheels, Matchbox, Majorette, Maisto, Tomica, Mini GT e outras).
 Responda SOMENTE com um objeto JSON com estas chaves:
 "nome" (nome do modelo), "marca", "serie" (série ou linha da miniatura), "ano" (ano de lançamento da miniatura, 4 dígitos),
@@ -662,16 +670,16 @@ function applyAI(r){
   if(STATUS.some(s=>s[0]===r.status)){sel.status=r.status;n++}if(CONS.some(s=>s[0]===r.conservacao)){sel.cons=r.conservacao;n++}
   syncSeg();return n;
 }
-async function runAI(input,images,btn){
-  if(!sample){aiMsg("O assistente de IA funciona quando o app está aberto no Claude.",true);return}
+async function runAI(input,img,btn){
+  if(!sample&&!remoteAI){aiMsg("O assistente de IA não está disponível neste endereço.",true);return}
   const prev=btn.innerHTML;btn.disabled=true;btn.textContent="Pensando…";aiMsg("A IA está analisando…");
-  try{const r=await sample.json(input,images?{images,modelTier:"default"}:{modelTier:"quick"});const n=applyAI(r);
+  try{const r=await askAI(input,img);const n=applyAI(r);
     aiMsg(n?`Preenchi ${n} campos. Confira e ajuste o que precisar.`:"Não consegui identificar. Tente descrever com mais detalhes.")}
   catch(e){aiMsg(e&&e.code==="not_granted"?"Permita o uso do Claude nesta página para ativar o assistente.":e&&e.code==="rate_limited"?"Muitas consultas seguidas. Espere alguns segundos.":"A IA não respondeu agora. Tente de novo.",true)}
   btn.innerHTML=prev;btn.disabled=false;if(btn.id==="aiPhoto")btn.disabled=!photo;
 }
 $("#aiPhoto").onclick=()=>{if(!photo)return;const extra=$("#aiText").value.trim();
-  runAI(AI_RULES+"\n\nIdentifique a miniatura da foto. Se houver cartela ou embalagem, use as informações impressas nela."+(extra?"\nO dono também disse: "+extra:""),[dataUrlToBlob(photo)],$("#aiPhoto"))};
+  runAI(AI_RULES+"\n\nIdentifique a miniatura da foto. Se houver cartela ou embalagem, use as informações impressas nela."+(extra?"\nO dono também disse: "+extra:""),photo,$("#aiPhoto"))};
 $("#aiFill").onclick=()=>{const t=$("#aiText").value.trim();if(!t){aiMsg("Fale ou escreva algo sobre o carrinho primeiro.",true);$("#aiText").focus();return}
   runAI(AI_RULES+"\n\nO dono descreveu o carrinho assim:\n"+t,null,$("#aiFill"))};
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;const micIdle=$("#mic").innerHTML;
@@ -720,8 +728,9 @@ async function init(){
   }
   sample=c&&c.use?await c.use("sample").catch(()=>null):null;
   if(sample){try{const l=await sample.limits();aiImages=!!l.images}catch(_){}}
+  if(!sample){try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),4000);const r=await fetch("api/ping",{signal:ctl.signal,cache:"no-store"});if(r.ok){const j=await r.json();remoteAI=!!(j&&j.ia);aiImages=remoteAI}}catch(_){}}
   $("#aiPhoto").disabled=!photo||!aiImages;
-  if(!sample)$("#aiBox").hidden=true;
+  if(!sample&&!remoteAI)$("#aiBox").hidden=true;
 }
 init();
 })();
