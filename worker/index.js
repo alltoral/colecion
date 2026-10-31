@@ -6,6 +6,9 @@
 //   2. Pesquisa na wiki da marca (Hot Wheels Wiki, Matchbox Wiki) o nome oficial da miniatura, séries e anos.
 //   3. Junta tudo e devolve a ficha final em JSON, usando a wiki como fonte para nome, série e ano.
 
+import { Colecao, handleSync } from "./sync.js";
+export { Colecao };
+
 const MODEL_VISION = "@cf/meta/llama-4-scout-17b-16e-instruct";
 const MODEL_TEXT = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 const MAX_IMAGE_CHARS = 1_500_000; // ~1 MB de imagem em base64
@@ -255,7 +258,8 @@ async function handleFicha(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.pathname === "/api/ping") return json({ ok: true, ia: Boolean(env.AI || env.ANTHROPIC_API_KEY), motor: env.ANTHROPIC_API_KEY ? "claude" : "workers-ai" });
+    if (url.pathname === "/api/ping") return json({ ok: true, ia: Boolean(env.AI || env.ANTHROPIC_API_KEY), motor: env.ANTHROPIC_API_KEY ? "claude" : "workers-ai", nuvem: Boolean(env.COLECAO) });
+    if (/^\/api\/(sync|carro\/|listas)/.test(url.pathname)) return handleSync(request, env, url);
     if (url.pathname === "/api/ficha") {
       if (request.method !== "POST") return json({ erro: "Use POST" }, 405);
       return handleFicha(request, env);

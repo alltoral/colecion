@@ -38,6 +38,14 @@ O que a IA faz: identifica o carrinho pela foto (ou pelo que você falou/digitou
 
 Depois de instalado, o app abre em tela cheia e funciona sem internet.
 
+## Nuvem e sincronização
+
+A coleção fica salva na nuvem do próprio Cloudflare (Durable Object com SQLite, já configurado em `wrangler.jsonc`, sem nada para criar no painel). Cada coleção tem um **código** (ex. `K7QM-4XPA`):
+
+- No primeiro acesso, o app pergunta: **Criar minha coleção** (gera o código e envia os carrinhos que já estavam no aparelho) ou **Entrar com o código** de outro aparelho.
+- O código fica no menu (☰), com o botão **Copiar**. Quem tiver o código vê e edita a coleção, então guarde com cuidado.
+- O app sincroniza ao abrir, ao voltar para a aba e a cada 15 segundos. Sem internet, salva no aparelho e envia quando a conexão voltar.
+
 ## Onde ficam os dados
 
 - **App instalado / GitHub Pages:** a coleção fica salva no próprio aparelho (IndexedDB). Use **Menu → Salvar cópia de segurança** de vez em quando, e **Restaurar cópia** para levar a coleção para outro aparelho.

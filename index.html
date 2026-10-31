@@ -110,6 +110,20 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .dbtn{display:flex;align-items:center;gap:8px;height:40px;padding:0 10px;border-radius:10px;border:none;background:transparent;font-weight:700;font-size:14px;color:var(--z-ink);text-align:left;cursor:pointer}
 .dbtn:hover{background:var(--z-tint)}
 .dbtn svg{width:18px;height:18px;color:var(--z-accent)}
+.syncbox{display:grid;gap:6px;background:var(--z-tint);border-radius:12px;padding:10px}
+.lab3{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--z-accent)}
+.lab4{font-size:12px;color:var(--z-ink-soft);line-height:1.35}
+.coderow{display:flex;gap:8px;align-items:center}
+.coderow b{font-family:var(--f-mono);font-size:20px;letter-spacing:.06em;color:var(--z-deep);flex:1}
+.coderow input{flex:1;min-width:0;height:46px;border-radius:12px;border:1.5px solid var(--z-border-strong);padding:0 14px;font-family:var(--f-mono);font-size:20px;letter-spacing:.08em;text-transform:uppercase;background:var(--z-surface)}
+.syncsheet{width:min(460px,100%);max-width:calc(100vw - 32px);grid-template-rows:auto 1fr;border-radius:var(--r-lg)!important}
+#syncOv{align-items:center;padding:16px}
+.syncbody{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;font-size:15px;line-height:1.45}
+.syncbody p{margin:0}
+.syncbody .save{width:100%;height:auto;min-height:52px;padding:10px 16px;white-space:normal;line-height:1.25}
+.ordiv{display:flex;align-items:center;gap:10px;color:var(--z-ink-soft);font-size:13px;font-weight:700;margin-top:4px}
+.ordiv::before,.ordiv::after{content:"";flex:1;height:1px;background:var(--z-border-strong)}
+.syncmsg{font-size:13px;color:var(--z-accent);min-height:1.2em}
 .dnote{font-size:12px;color:var(--z-ink-soft);padding:0 10px 4px;line-height:1.4}
 
 /* ---------- banner ---------- */
@@ -326,6 +340,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <button class="dbtn" id="toggleBanner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="8" rx="2"/><path d="M3 17h18M3 20h12"/></svg><span>Ocultar banners</span></button>
     <button class="dbtn" id="bExport" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"/></svg>Salvar cópia de segurança</button>
     <label class="dbtn" id="bImport" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V9M7 14l5-5 5 5M4 4h16"/></svg>Restaurar cópia<input type="file" id="importFile" accept="application/json" hidden></label>
+    <div class="syncbox" id="syncBox" hidden><span class="lab3">Código da coleção</span><div class="coderow"><b id="syncCode"></b><button class="minib" id="syncCopy">Copiar</button></div><span class="lab4">Use este código para abrir a mesma coleção em outro celular ou computador.</span><button class="dbtn" id="syncSwap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg>Entrar em outra coleção</button></div>
     <div class="dnote" id="dnote"></div>
   </div>
 </aside>
@@ -398,6 +413,19 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 </div>
 <datalist id="seriesList"></datalist>
 <datalist id="marcas"><option>Hot Wheels</option><option>Matchbox</option><option>Majorette</option><option>Maisto</option><option>Tomica</option><option>Mini GT</option><option>Greenlight</option><option>Johnny Lightning</option><option>M2 Machines</option></datalist>
+<div class="overlay" id="syncOv" hidden>
+  <section class="sheet syncsheet" role="dialog" aria-modal="true" aria-labelledby="syncT">
+    <div class="sh-head"><h3 id="syncT">Sua coleção na nuvem</h3><button class="x" id="syncClose" aria-label="Fechar" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="sh-body syncbody">
+      <p>Para os carrinhos aparecerem iguais no celular e no computador, a coleção fica salva na nuvem com um código só seu.</p>
+      <button class="save" id="syncNew">Criar minha coleção</button>
+      <div class="ordiv"><span>Já criou no outro aparelho?</span></div>
+      <label class="lab" for="syncIn">Digite o código da coleção</label>
+      <div class="coderow"><input id="syncIn" placeholder="K7QM-4XPA" autocomplete="off" autocapitalize="characters" spellcheck="false"><button class="abtn go" id="syncGo">Entrar</button></div>
+      <p class="syncmsg" id="syncMsg" role="status"></p>
+    </div>
+  </section>
+</div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -790,17 +818,100 @@ $("#mic").onclick=()=>{
 
 /* ---------- armazenamento: Claude (nuvem) ou IndexedDB (app instalado) ---------- */
 function setCars(list){cars=list;loaded=true;render()}
-function idbStore(){
-  const open=()=>new Promise((ok,no)=>{const r=indexedDB.open("colecao-neon",1);r.onupgradeneeded=()=>r.result.createObjectStore("carros",{keyPath:"id"});r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
-  const dbp=open();
+function openIdb(){
+  const dbp=new Promise((ok,no)=>{const r=indexedDB.open("colecao-neon",1);r.onupgradeneeded=()=>r.result.createObjectStore("carros",{keyPath:"id"});r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
   const tx=async(mode,fn)=>{const db=await dbp;return new Promise((ok,no)=>{const t=db.transaction("carros",mode);fn(t.objectStore("carros"));t.oncomplete=()=>ok();t.onerror=()=>no(t.error)})};
-  const all=async()=>{const db=await dbp;return new Promise((ok,no)=>{const r=db.transaction("carros").objectStore("carros").getAll();r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})};
-  const refresh=async()=>setCars(await all());
-  (async()=>{try{const old=JSON.parse(localStorage.getItem("colecao-neon-carros")||"null");if(old&&!(await all()).length)await tx("readwrite",s=>{for(const [id,v] of Object.entries(old))s.put({...v,id})})}catch(_){}
-    try{await refresh()}catch(_){setCars([]);toast("Este navegador não deixou salvar a coleção")}})();
-  return {kind:"local",save:async(id,v)=>{await tx("readwrite",s=>s.put({...v,id}));await refresh()},remove:async id=>{await tx("readwrite",s=>s.delete(id));await refresh()},
-    importAll:async list=>{await tx("readwrite",s=>{for(const c of list)if(c&&c.id)s.put(c)});await refresh()}};
+  const req=async q=>{const db=await dbp;return new Promise((ok,no)=>{const r=q(db.transaction("carros").objectStore("carros"));r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)})};
+  return {all:()=>req(s=>s.getAll()),get:id=>req(s=>s.get(id)),put:d=>tx("readwrite",s=>s.put(d)),putMany:l=>tx("readwrite",s=>{for(const d of l)if(d&&d.id)s.put(d)}),del:id=>tx("readwrite",s=>s.delete(id)),clear:()=>tx("readwrite",s=>s.clear())};
 }
+function idbStore(){
+  const I=openIdb();
+  const refresh=async()=>setCars(await I.all());
+  (async()=>{try{const old=JSON.parse(localStorage.getItem("colecao-neon-carros")||"null");if(old&&!(await I.all()).length)await I.putMany(Object.entries(old).map(([id,v])=>({...v,id})))}catch(_){}
+    try{await refresh()}catch(_){setCars([]);toast("Este navegador não deixou salvar a coleção")}})();
+  return {kind:"local",idb:I,save:async(id,v)=>{await I.put({...v,id});await refresh()},remove:async id=>{await I.del(id);await refresh()},importAll:async list=>{await I.putMany(list);await refresh()}};
+}
+
+/* ---------- nuvem: sincroniza todos os aparelhos pelo código da coleção ---------- */
+const fmtCode=c=>{const n=String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"");return n.length>4?n.slice(0,4)+"-"+n.slice(4):n};
+function genCode(){const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",r=new Uint8Array(8);crypto.getRandomValues(r);return fmtCode([...r].map(x=>A[x%A.length]).join(""))}
+let syncState="";
+function setSyncState(st,extra){syncState=st;const code=pref("neon-codigo");
+  $("#dnote").innerHTML=st==="ok"?`Sincronizado na nuvem${extra?` · ${extra}`:""}.`:st==="off"?"Sem conexão com a nuvem. As mudanças ficam neste aparelho e sobem quando a internet voltar.":st==="busy"?"Sincronizando…":"Salvo só neste aparelho.";
+  $("#syncBox").hidden=!code;if(code)$("#syncCode").textContent=fmtCode(code)}
+function cloudStore(code,migrar){
+  const I=openIdb(),H={"x-colecao":code},KS="neon-since-"+code,KO="neon-outbox-"+code;
+  let since=+(pref(KS)||0),outbox=[];try{outbox=JSON.parse(localStorage.getItem(KO)||"[]")}catch(_){}
+  const saveOut=()=>{try{localStorage.setItem(KO,JSON.stringify(outbox))}catch(_){}};
+  const queue=(op,id)=>{outbox=outbox.filter(o=>o.id!==id);outbox.push({op,id});saveOut()};
+  async function api(method,path,body){const r=await fetch("api/"+path,{method,cache:"no-store",headers:body?{...H,"content-type":"application/json"}:H,body:body?JSON.stringify(body):undefined});if(!r.ok){const e=new Error(String(r.status));e.status=r.status;throw e}return r.json()}
+  async function pull(){
+    let mais=true,ids=[],listasNuvem=null;
+    while(mais){const j=await api("GET","sync?since="+since);ids=j.ids;if(j.docs.length)await I.putMany(j.docs.map(({_u,...d})=>d));since=j.ate;mais=j.mais;if(j.listas)listasNuvem=j.listas}
+    pref(KS,String(since));
+    const pend=new Set(outbox.map(o=>o.id)),keep=new Set(ids);
+    for(const c of await I.all())if(!keep.has(c.id)&&!pend.has(c.id))await I.del(c.id);
+    if(listasNuvem&&listasNuvem.marcas){listas=listasNuvem;try{localStorage.setItem("colecao-neon-listas",JSON.stringify(listas))}catch(_){}}
+    return keep;
+  }
+  async function flush(){
+    while(outbox.length){const o=outbox[0];
+      try{if(o.op==="put"){const d=await I.get(o.id);if(d)await api("PUT","carro/"+encodeURIComponent(o.id),d)}else await api("DELETE","carro/"+encodeURIComponent(o.id))}
+      catch(e){if(e.status===413||e.status===400){outbox.shift();saveOut();toast("Um carrinho não subiu: a foto está pesada demais");continue}throw e}
+      outbox.shift();saveOut()}
+  }
+  let busy=false,again=false;
+  async function sync(){if(busy){again=true;return}busy=true;
+    try{await flush();await pull();setCars(await I.all());setSyncState("ok",`${cars.filter(c=>!isWish(c)).length} cartelas`)}
+    catch(_){setSyncState("off")}
+    busy=false;if(again){again=false;sync()}}
+  (async()=>{
+    try{setCars(await I.all())}catch(_){setCars([])}
+    if(migrar){ // envia os carrinhos que já estavam neste aparelho
+      try{
+        const locais=await I.all();for(const c of locais)queue("put",c.id);
+        setSyncState("busy");const naNuvem=await pull();
+        const usados=new Set((await I.all()).filter(c=>naNuvem.has(c.id)&&!isWish(c)).map(c=>c.num));
+        let max=Math.max(0,...usados);
+        for(const c of locais){if(naNuvem.has(c.id)||isWish(c))continue;if(!c.num||usados.has(c.num)){c.num=++max;await I.put(c)}usados.add(c.num)}
+      }catch(_){}
+    }
+    sync();
+  })();
+  setInterval(()=>{if(!document.hidden)sync()},15000);
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)sync()});
+  window.addEventListener("online",sync);
+  listasSave=L=>{try{localStorage.setItem("colecao-neon-listas",JSON.stringify(L))}catch(_){}api("PUT","listas",L).catch(()=>{})};
+  return {kind:"cloud",idb:I,
+    save:async(id,v)=>{await I.put({...v,id});queue("put",id);setCars(await I.all());sync()},
+    remove:async id=>{await I.del(id);queue("del",id);setCars(await I.all());sync()},
+    importAll:async list=>{await I.putMany(list);for(const c of list)if(c&&c.id)queue("put",c.id);setCars(await I.all());sync()}};
+}
+function openSync(modo){
+  const ov=$("#syncOv");ov.hidden=false;$("#syncMsg").textContent="";$("#syncIn").value="";syncConfirm=false;
+  $("#syncClose").hidden=modo!=="trocar";
+  $("#syncNew").textContent=cars.length?`Criar minha coleção e enviar os ${cars.length} carrinhos deste aparelho`:"Criar minha coleção";
+}
+let syncConfirm=false;
+async function conectar(code,migrar){
+  pref("neon-codigo",fmtCode(code));
+  if(!migrar){try{await openIdb().clear()}catch(_){}}
+  $("#syncOv").hidden=true;store=cloudStore(fmtCode(code),migrar);setSyncState("busy");
+}
+$("#syncNew").onclick=()=>{const c=genCode();conectar(c,true);setTimeout(()=>{toast(`Coleção criada. Código: ${c}`);openDrawer()},600)};
+$("#syncGo").onclick=async()=>{
+  const c=$("#syncIn").value.toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if(c.length<8){$("#syncMsg").textContent="O código tem 8 letras e números, como K7QM-4XPA.";$("#syncIn").focus();return}
+  if(!syncConfirm){$("#syncMsg").textContent="Conferindo…";
+    try{const r=await fetch("api/sync?since=0",{headers:{"x-colecao":c},cache:"no-store"});const j=await r.json();
+      if(!j.ids||!j.ids.length){syncConfirm=true;$("#syncMsg").textContent="Esse código ainda não tem carrinhos. Confira se digitou certo ou toque em Entrar de novo para usar mesmo assim.";return}}
+    catch(_){$("#syncMsg").textContent="Sem conexão agora. Tente de novo com internet.";return}}
+  conectar(c,cars.length>0);toast("Coleção conectada")};
+$("#syncIn").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#syncGo").click()}});
+$("#syncIn").addEventListener("input",()=>{syncConfirm=false;$("#syncMsg").textContent=""});
+$("#syncClose").onclick=()=>$("#syncOv").hidden=true;
+$("#syncCopy").onclick=async()=>{const c=$("#syncCode").textContent;try{await navigator.clipboard.writeText(c);toast("Código copiado")}catch(_){const r=document.createRange();r.selectNodeContents($("#syncCode"));const se=getSelection();se.removeAllRanges();se.addRange(r);toast("Código selecionado, copie com Ctrl+C")}};
+$("#syncSwap").onclick=()=>{closeDrawer();openSync("trocar")};
 $("#bExport").onclick=()=>{const blob=new Blob([JSON.stringify({app:"colecao-neon",versao:2,carros:cars,listas:getListas()})],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`colecao-neon-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();toast("Cópia salva")};
 $("#importFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.listas&&d.listas.marcas){listas=d.listas;persistListas()}await store.importAll(d.carros||[]);toast(`${(d.carros||[]).length} cartelas restauradas`)}catch(_){toast("Esse arquivo não é uma cópia da Coleção Neon")}e.target.value=""};
 async function init(){
@@ -815,15 +926,18 @@ async function init(){
     listasSave=L=>ld.set({marcas:L.marcas,series:L.series});
     $("#dnote").textContent="Sincronizado pelo Claude.";
   }else{
-    store=idbStore();$("#bExport").hidden=false;$("#bImport").hidden=false;
+    $("#bExport").hidden=false;$("#bImport").hidden=false;
     try{const v=JSON.parse(localStorage.getItem("colecao-neon-listas")||"null");if(v&&v.marcas)listas=v}catch(_){}
     listasSave=L=>{try{localStorage.setItem("colecao-neon-listas",JSON.stringify(L))}catch(_){}};
-    $("#dnote").textContent="Salvo neste aparelho. Faça uma cópia de segurança de vez em quando.";
+    let nuvem=false;try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),5000);const r=await fetch("api/ping",{signal:ctl.signal,cache:"no-store"});if(r.ok){const j=await r.json();nuvem=!!j.nuvem;remoteAI=!!j.ia;aiImages=remoteAI}}catch(_){}
+    const code=pref("neon-codigo");
+    if(code)store=cloudStore(code,false);
+    else{store=idbStore();setSyncState("");if(nuvem)setTimeout(()=>openSync("inicio"),900)}
     if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
   }
   sample=c&&c.use?await c.use("sample").catch(()=>null):null;
   if(sample){try{const l=await sample.limits();aiImages=!!l.images}catch(_){}}
-  if(!sample){try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),4000);const r=await fetch("api/ping",{signal:ctl.signal,cache:"no-store"});if(r.ok){const j=await r.json();remoteAI=!!(j&&j.ia);aiImages=remoteAI}}catch(_){}}
+
   $("#aiPhoto").disabled=!photo||!aiImages;
   if(!sample&&!remoteAI)$("#aiBox").hidden=true;
 }

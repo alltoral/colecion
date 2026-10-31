@@ -11,6 +11,11 @@
   "ai": {
     "binding": "AI"
   },
+  // nuvem da coleção: um Durable Object (SQLite) por código de coleção
+  "durable_objects": {
+    "bindings": [{ "name": "COLECAO", "class_name": "Colecao" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Colecao"] }],
   "observability": {
     "enabled": true
   }
