@@ -112,6 +112,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .dbtn svg{width:18px;height:18px;color:var(--z-accent)}
 .syncbox{display:grid;gap:6px;background:var(--z-tint);border-radius:12px;padding:10px}
 .lab3{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--z-accent)}
+.linkbtn{display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:12px;border:none;background:var(--z-grad);color:#fff;font-weight:800;font-size:15px;text-shadow:0 1px 2px rgba(0,0,0,.25);cursor:pointer}
+.linkbtn svg{width:20px;height:20px}
 .lab4{font-size:12px;color:var(--z-ink-soft);line-height:1.35}
 .coderow{display:flex;gap:8px;align-items:center}
 .coderow b{font-family:var(--f-mono);font-size:20px;letter-spacing:.06em;color:var(--z-deep);flex:1}
@@ -340,7 +342,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <button class="dbtn" id="toggleBanner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="8" rx="2"/><path d="M3 17h18M3 20h12"/></svg><span>Ocultar banners</span></button>
     <button class="dbtn" id="bExport" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"/></svg>Salvar cópia de segurança</button>
     <label class="dbtn" id="bImport" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V9M7 14l5-5 5 5M4 4h16"/></svg>Restaurar cópia<input type="file" id="importFile" accept="application/json" hidden></label>
-    <div class="syncbox" id="syncBox" hidden><span class="lab3">Código da coleção</span><div class="coderow"><b id="syncCode"></b><button class="minib" id="syncCopy">Copiar</button></div><span class="lab4">Use este código para abrir a mesma coleção em outro celular ou computador.</span><button class="dbtn" id="syncSwap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg>Entrar em outra coleção</button></div>
+    <div class="syncbox" id="syncBox" hidden><span class="lab3">Código da coleção</span><div class="coderow"><b id="syncCode"></b><button class="minib" id="syncCopy">Copiar</button></div><button class="linkbtn" id="syncLink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg>Conectar outro aparelho</button><span class="lab4">Gera um link para mandar pelo WhatsApp. É só abrir no outro celular ou computador uma vez que ele já entra na coleção.</span><button class="dbtn" id="syncSwap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg>Entrar em outra coleção</button></div>
     <div class="dnote" id="dnote"></div>
   </div>
 </aside>
@@ -835,11 +837,12 @@ function idbStore(){
 /* ---------- nuvem: sincroniza todos os aparelhos pelo código da coleção ---------- */
 const fmtCode=c=>{const n=String(c||"").toUpperCase().replace(/[^A-Z0-9]/g,"");return n.length>4?n.slice(0,4)+"-"+n.slice(4):n};
 function genCode(){const A="ABCDEFGHJKLMNPQRSTUVWXYZ23456789",r=new Uint8Array(8);crypto.getRandomValues(r);return fmtCode([...r].map(x=>A[x%A.length]).join(""))}
-let syncState="";
+let syncState="",cloudGen=0;
 function setSyncState(st,extra){syncState=st;const code=pref("neon-codigo");
   $("#dnote").innerHTML=st==="ok"?`Sincronizado na nuvem${extra?` · ${extra}`:""}.`:st==="off"?"Sem conexão com a nuvem. As mudanças ficam neste aparelho e sobem quando a internet voltar.":st==="busy"?"Sincronizando…":"Salvo só neste aparelho.";
   $("#syncBox").hidden=!code;if(code)$("#syncCode").textContent=fmtCode(code)}
 function cloudStore(code,migrar){
+  const gen=++cloudGen,vivo=()=>gen===cloudGen;
   const I=openIdb(),H={"x-colecao":code},KS="neon-since-"+code,KO="neon-outbox-"+code;
   let since=+(pref(KS)||0),outbox=[];try{outbox=JSON.parse(localStorage.getItem(KO)||"[]")}catch(_){}
   const saveOut=()=>{try{localStorage.setItem(KO,JSON.stringify(outbox))}catch(_){}};
@@ -861,8 +864,8 @@ function cloudStore(code,migrar){
       outbox.shift();saveOut()}
   }
   let busy=false,again=false;
-  async function sync(){if(busy){again=true;return}busy=true;
-    try{await flush();await pull();setCars(await I.all());setSyncState("ok",`${cars.filter(c=>!isWish(c)).length} cartelas`)}
+  async function sync(){if(!vivo())return;if(busy){again=true;return}busy=true;
+    try{await flush();await pull();if(!vivo()){busy=false;return}setCars(await I.all());setSyncState("ok",`${cars.filter(c=>!isWish(c)).length} cartelas`)}
     catch(_){setSyncState("off")}
     busy=false;if(again){again=false;sync()}}
   (async()=>{
@@ -906,11 +909,26 @@ $("#syncGo").onclick=async()=>{
     try{const r=await fetch("api/sync?since=0",{headers:{"x-colecao":c},cache:"no-store"});const j=await r.json();
       if(!j.ids||!j.ids.length){syncConfirm=true;$("#syncMsg").textContent="Esse código ainda não tem carrinhos. Confira se digitou certo ou toque em Entrar de novo para usar mesmo assim.";return}}
     catch(_){$("#syncMsg").textContent="Sem conexão agora. Tente de novo com internet.";return}}
-  conectar(c,cars.length>0);toast("Coleção conectada")};
+  conectar(c,!pref("neon-codigo")&&cars.length>0);toast("Coleção conectada")};
 $("#syncIn").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#syncGo").click()}});
 $("#syncIn").addEventListener("input",()=>{syncConfirm=false;$("#syncMsg").textContent=""});
 $("#syncClose").onclick=()=>$("#syncOv").hidden=true;
 $("#syncCopy").onclick=async()=>{const c=$("#syncCode").textContent;try{await navigator.clipboard.writeText(c);toast("Código copiado")}catch(_){const r=document.createRange();r.selectNodeContents($("#syncCode"));const se=getSelection();se.removeAllRanges();se.addRange(r);toast("Código selecionado, copie com Ctrl+C")}};
+$("#syncLink").onclick=async()=>{
+  const code=pref("neon-codigo");if(!code)return;
+  const url=location.origin+location.pathname+"?c="+encodeURIComponent(fmtCode(code));
+  if(navigator.share){try{await navigator.share({title:"Coleção Neon",text:"Abra este link para conectar este aparelho à nossa Coleção Neon:",url});return}catch(e){if(e&&e.name==="AbortError")return}}
+  try{await navigator.clipboard.writeText(url);toast("Link copiado. Mande para o outro aparelho e abra lá.")}catch(_){toast(url)}};
+/* abriu um link de conexão: entra na coleção sem digitar nada */
+async function linkConexao(atual){
+  const qc=new URLSearchParams(location.search).get("c");if(!qc)return false;
+  try{history.replaceState(null,"",location.pathname+location.hash)}catch(_){}
+  const n=fmtCode(qc);if(n.replace(/-/g,"").length<8)return false;
+  if(atual&&fmtCode(atual)===n){toast("Este aparelho já está nesta coleção");return false}
+  if(atual){openSync("trocar");$("#syncIn").value=n;$("#syncMsg").textContent="Este link é de outra coleção. Toque em Entrar para trocar.";syncConfirm=true;return true}
+  let locais=0;try{locais=(await openIdb().all()).length}catch(_){}
+  await conectar(n,locais>0);toast("Aparelho conectado à coleção");return true;
+}
 $("#syncSwap").onclick=()=>{closeDrawer();openSync("trocar")};
 $("#bExport").onclick=()=>{const blob=new Blob([JSON.stringify({app:"colecao-neon",versao:2,carros:cars,listas:getListas()})],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`colecao-neon-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();toast("Cópia salva")};
 $("#importFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.listas&&d.listas.marcas){listas=d.listas;persistListas()}await store.importAll(d.carros||[]);toast(`${(d.carros||[]).length} cartelas restauradas`)}catch(_){toast("Esse arquivo não é uma cópia da Coleção Neon")}e.target.value=""};
@@ -931,7 +949,8 @@ async function init(){
     listasSave=L=>{try{localStorage.setItem("colecao-neon-listas",JSON.stringify(L))}catch(_){}};
     let nuvem=false;try{const ctl=new AbortController();setTimeout(()=>ctl.abort(),5000);const r=await fetch("api/ping",{signal:ctl.signal,cache:"no-store"});if(r.ok){const j=await r.json();nuvem=!!j.nuvem;remoteAI=!!j.ia;aiImages=remoteAI}}catch(_){}
     const code=pref("neon-codigo");
-    if(code)store=cloudStore(code,false);
+    if(nuvem&&await linkConexao(code)&&!code){}
+    else if(code)store=cloudStore(code,false);
     else{store=idbStore();setSyncState("");if(nuvem)setTimeout(()=>openSync("inicio"),900)}
     if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
   }

@@ -43,6 +43,7 @@ Depois de instalado, o app abre em tela cheia e funciona sem internet.
 A coleção fica salva na nuvem do próprio Cloudflare (Durable Object com SQLite, já configurado em `wrangler.jsonc`, sem nada para criar no painel). Cada coleção tem um **código** (ex. `K7QM-4XPA`):
 
 - No primeiro acesso, o app pergunta: **Criar minha coleção** (gera o código e envia os carrinhos que já estavam no aparelho) ou **Entrar com o código** de outro aparelho.
+- Para conectar outro aparelho sem digitar nada: menu ☰ → **Conectar outro aparelho**. O app gera um link (ex. `.../?c=K7QM-4XPA`); abra no outro celular ou computador uma vez e ele já entra na coleção.
 - O código fica no menu (☰), com o botão **Copiar**. Quem tiver o código vê e edita a coleção, então guarde com cuidado.
 - O app sincroniza ao abrir, ao voltar para a aba e a cada 15 segundos. Sem internet, salva no aparelho e envia quando a conexão voltar.
 
