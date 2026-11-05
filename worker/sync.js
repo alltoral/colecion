@@ -110,7 +110,7 @@ export class Colecao extends DurableObject {
         return json({ erro: "Envio inválido" }, 400);
       }
       if (!l || !Array.isArray(l.marcas) || !Array.isArray(l.series)) return json({ erro: "Listas inválidas" }, 400);
-      await st.put("listas", { marcas: l.marcas.slice(0, 500), series: l.series.slice(0, 3000) });
+      await st.put("listas", { marcas: l.marcas.slice(0, 500), series: l.series.slice(0, 3000), ...(Array.isArray(l.tipos) ? { tipos: l.tipos.slice(0, 300) } : {}) });
       return json({ ok: true });
     }
 

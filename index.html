@@ -112,6 +112,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .dbtn{display:flex;align-items:center;gap:8px;height:40px;padding:0 10px;border-radius:10px;border:none;background:transparent;font-weight:700;font-size:14px;color:var(--z-ink);text-align:left;cursor:pointer}
 .dbtn:hover{background:var(--z-tint)}
 .dbtn svg{width:18px;height:18px;color:var(--z-accent)}
+.dmore{justify-content:flex-start}
+.dmore span{flex:1}
+.dmore .chev{width:16px;height:16px;color:var(--z-ink-soft);transition:transform .2s}
+.dmore[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.dopts{display:grid;gap:6px;max-height:55vh;overflow:auto}
 .syncbox{display:grid;gap:6px;background:var(--z-tint);border-radius:12px;padding:10px}
 .lab3{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--z-accent)}
 .linkbtn{display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:12px;border:none;background:var(--z-grad);color:#fff;font-weight:800;font-size:15px;text-shadow:0 1px 2px rgba(0,0,0,.25);cursor:pointer}
@@ -186,6 +191,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .cons{position:absolute;z-index:3;left:2.6cqi;bottom:2.6cqi;font-size:5.6cqi;font-weight:800;padding:1cqi 2.4cqi;border-radius:2cqi;background:rgba(20,18,25,.82);color:#fff}
 .sticker{position:absolute;z-index:3;right:1.6cqi;top:1.6cqi;width:24cqi;height:24cqi;display:grid;place-items:center;text-align:center;background:var(--sc,var(--yellow));color:var(--ink);font-family:var(--f-display);font-size:5cqi;line-height:1;transform:rotate(12deg);
   clip-path:polygon(50% 0,61% 13%,77% 5%,79% 22%,95% 23%,88% 39%,100% 50%,88% 61%,95% 77%,79% 78%,77% 95%,61% 87%,50% 100%,39% 87%,23% 95%,21% 78%,5% 77%,12% 61%,0 50%,12% 39%,5% 23%,21% 22%,23% 5%,39% 13%)}
+.etq{position:absolute;z-index:4;right:2.4cqi;top:2.6cqi;height:9cqi;padding:0 2.6cqi 0 6.4cqi;min-width:15cqi;background:var(--sc);color:var(--ink);display:flex;align-items:center;font-family:var(--f-display);font-size:5cqi;line-height:1;cursor:pointer;
+  clip-path:polygon(3.6cqi 0,100% 0,100% 100%,3.6cqi 100%,0 50%);border-radius:0 1.4cqi 1.4cqi 0;transform:rotate(9deg);transform-origin:100% 0}
+.etq::before{content:"";position:absolute;left:3.4cqi;top:50%;width:1.9cqi;height:1.9cqi;margin-top:-.95cqi;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 .35cqi rgba(0,0,0,.28)}
+.etq>span{display:block;max-width:0;overflow:hidden;white-space:nowrap;transition:max-width .25s ease}
+.etq.open>span{max-width:40cqi}
+.etq:focus-visible{outline:2px solid var(--ink);outline-offset:1px}
 .ptag{position:absolute;z-index:3;right:2.4cqi;top:3cqi;background:var(--sc);color:var(--ink);font-family:var(--f-display);font-size:5.6cqi;line-height:1;padding:1.6cqi 2.6cqi 1.3cqi;border-radius:1.6cqi;transform:rotate(7deg);box-shadow:0 .6cqi 1.4cqi rgba(0,0,0,.25)}
 .info{display:flex;justify-content:space-between;align-items:center;gap:2cqi;padding:2.6cqi 4.6cqi 3.2cqi}
 .year{font-family:var(--f-display);font-size:11.5cqi;line-height:.9}
@@ -222,8 +233,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .rear-h span{font-family:var(--f-mono);font-size:5.4cqi;font-weight:600;white-space:nowrap}
 .rear-face dl{margin:0;display:grid;grid-template-columns:auto 1fr;align-content:start;font-size:6.2cqi;min-height:0;overflow:hidden}
 .rear-face dt,.rear-face dd{padding:1.25cqi 0;border-bottom:.3cqi solid #e3ecda}
-.rear-face dt{font-size:5.2cqi;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#6B7280;padding-right:3cqi;align-self:center}
-.rear-face dd{margin:0;font-weight:800;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.rear-face dt{font-size:5.2cqi;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#6B7280;padding-right:3cqi;display:flex;align-items:center}
+.rear-face dd{margin:0;line-height:1.35;font-weight:800;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .dot{display:inline-block;width:4cqi;height:4cqi;border-radius:50%;background:var(--c);vertical-align:-.4cqi;margin-right:1.4cqi;box-shadow:inset 0 0 0 .3cqi rgba(0,0,0,.2)}
 .rear-f{display:flex;justify-content:space-between;align-items:flex-end;gap:3cqi}
 .rear-f svg{height:10cqi;width:44cqi}
@@ -313,6 +324,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .swatches{display:flex;flex-wrap:wrap;gap:6px}
 .swatches button{width:28px;height:28px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--z-border-strong);background:var(--c)}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg.one{flex-wrap:nowrap}
+.seg.one button{flex:1 1 0;min-width:0;padding:0 6px;white-space:nowrap}
 .seg button{height:38px;padding:0 13px;border-radius:999px;border:1.5px solid var(--z-border-strong);background:var(--z-surface);font-size:14px;font-weight:700;color:var(--z-ink-soft)}
 .seg button[aria-pressed="true"]{background:var(--z-accent);color:#fff;border-color:var(--z-accent)}
 .save{height:48px;padding:0 24px;border-radius:var(--r-md);border:none;background:var(--z-grad);color:#fff;font-weight:800;font-size:16px;text-shadow:0 1px 2px rgba(0,0,0,.25)}
@@ -354,10 +367,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <div class="dh"><b>Coleção Neon</b><button id="dClose" aria-label="Fechar menu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   <nav class="dnav" id="dnav"></nav>
   <div class="dfoot" id="dfoot">
+    <button class="dbtn dmore" id="dMore" aria-expanded="false" aria-controls="dOpts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.6 1.6 0 00-1-1.5 1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H3a2 2 0 110-4h.1a1.6 1.6 0 001.5-1 1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H9a1.6 1.6 0 001-1.5V3a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg><span>Opções e código da coleção</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div class="dopts" id="dOpts" hidden>
     <button class="dbtn" id="toggleBanner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="8" rx="2"/><path d="M3 17h18M3 20h12"/></svg><span>Ocultar banners</span></button>
     <button class="dbtn" id="bExport" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11M7 10l5 5 5-5M4 20h16"/></svg>Salvar cópia de segurança</button>
     <label class="dbtn" id="bImport" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V9M7 14l5-5 5 5M4 4h16"/></svg>Restaurar cópia<input type="file" id="importFile" accept="application/json" hidden></label>
     <div class="syncbox" id="syncBox" hidden><span class="lab3">Código da coleção</span><div class="coderow"><b id="syncCode"></b><button class="minib" id="syncCopy">Copiar</button></div><button class="linkbtn" id="syncLink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg>Conectar outro aparelho</button><span class="lab4">Gera um link para mandar pelo WhatsApp. É só abrir no outro celular ou computador uma vez que ele já entra na coleção.</span><button class="dbtn" id="syncSwap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 7h13l-3-3M17 17H4l3 3"/></svg>Entrar em outra coleção</button></div>
+    </div>
     <div class="dnote" id="dnote"></div>
   </div>
 </aside>
@@ -415,11 +431,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
               <div class="f"><label for="fSerieSel">Série</label><input type="hidden" id="fSerie">
                 <div class="dd"><select id="fSerieSel"></select><button type="button" class="ddx" id="sDel" aria-label="Excluir a série escolhida da lista" title="Excluir da lista"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div>
                 <div class="ddnew" id="sNew" hidden><input id="newS" placeholder="Nome da nova série" aria-label="Nome da nova série"><button type="button" class="ok" id="addS">Adicionar</button><button type="button" id="cancelS">Cancelar</button></div></div>
-              <div class="f"><label for="fTipo">Tipo de veículo</label><select id="fTipo"></select></div>
+              <div class="f"><label for="fTipoSel">Tipo de veículo</label><input type="hidden" id="fTipo">
+                <div class="dd"><select id="fTipoSel"></select><button type="button" class="ddx" id="tDel" aria-label="Excluir o tipo escolhido da lista" title="Excluir da lista"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></div>
+                <div class="ddnew" id="tNew" hidden><input id="newT" placeholder="Nome do novo tipo" aria-label="Nome do novo tipo"><button type="button" class="ok" id="addT">Adicionar</button><button type="button" id="cancelT">Cancelar</button></div></div>
               <div class="f"><label for="fDesde">Incluído em</label><input id="fDesde" type="date"></div>
               <div class="f full"><span class="lab">Cor da cartela · sai da foto, ajuste se quiser</span>
                 <div class="colorpick"><label class="cprev" id="cPrev" style="--c:#c9c4d2"><input type="color" id="fHex" value="#c9c4d2" aria-label="Escolher cor exata"></label><span class="chex" id="cHex">Sem cor</span><div class="swatches" id="fCor"></div></div></div>
-              <div class="f full" id="rowStatus"><span class="lab">Status</span><div class="seg" id="fStatus" role="group" aria-label="Status"></div></div>
+              <div class="f full" id="rowStatus"><span class="lab">Status · toque de novo para tirar</span><div class="seg one" id="fStatus" role="group" aria-label="Status"></div></div>
               <div class="f full" id="rowCons"><span class="lab">Conservação</span><div class="seg" id="fCons" role="group" aria-label="Conservação"></div></div>
             </div>
           </div>
@@ -450,9 +468,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 (() => {
 const CORES={Vermelho:"#e8231d",Laranja:"#ff6a00",Amarelo:"#ffd000",Verde:"#12b04f",Turquesa:"#00bfb8",Azul:"#1f4fff",Roxo:"#7a2cff",Rosa:"#ff2d87",Dourado:"#d49a1c",Prata:"#b8bec8",Branco:"#f4f4f7",Preto:"#212027"};
 const TIPOS=["Esportivo","Muscle car","Clássico","JDM","Corrida","Caminhonete","SUV","Utilitário","Caminhão","Moto","Monster truck","Fantasia","Outro"];
-const STATUS=[["detalhar","Será detalhado"],["reformar","Será reformado"],["reformado","Reformado"],["nao-reformar","Não será reformado"]];
+const STATUS=[["detalhar","Detalhar"],["reformar","Reformar"],["reformado","Reformado"]];
 const isWish=c=>c&&c.status==="desejo";
-const stOf=c=>c.status==="desejo"?"desejo":["detalhar","reformar","reformado","nao-reformar"].includes(c.status)?c.status:"nao-reformar";
+const stOf=c=>c.status==="desejo"?"desejo":["detalhar","reformar","reformado"].includes(c.status)?c.status:"";
 const CONS=[["lacrado","Lacrado"],["novo","Novo"],["usado","Usado"],["desgastado","Desgastado"]];
 const BRANDS={"Hot Wheels":["#e8231d","#ff8a00","#ffffff"],"Matchbox":["#ffd000","#1f4fff","#141219"],"Majorette":["#d71920","#0b2a6f","#ffffff"],"Maisto":["#1b1a20","#ffd000","#ffffff"],"Tomica":["#1f4fff","#e8231d","#ffffff"],"Mini GT":["#1b1a20","#e9e9ee","#ffffff"],"Greenlight":["#12b04f","#1b1a20","#ffffff"],"Johnny Lightning":["#7a2cff","#ffd000","#ffffff"],"M2 Machines":["#ff6a00","#1b1a20","#ffffff"]};
 const $=s=>document.querySelector(s);
@@ -537,11 +555,12 @@ let fitT;window.addEventListener("resize",()=>{clearTimeout(fitT);fitT=setTimeou
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>fitNames());
 function faceHTML(c,full){
   const p=palette(c),cs=CONS.find(s=>s[0]===c.conservacao),ph=photoOf(c);
+  const et=isWish(c)?null:({detalhar:["DETALHAR","#ffe100"],reformar:["REFORMAR","#ff9a3c"],reformado:["REFORMADO","#A4EA4F"]})[stOf(c)];
   const stick=full&&isWish(c)?["QUERO","#ffd2a8"]:null,tag=!full||isWish(c)?null:stOf(c)==="detalhar"?["DETALHAR","#ffe100"]:stOf(c)==="reformar"?["REFORMAR","#ff9a3c"]:stOf(c)==="reformado"?["REFORMADO","#A4EA4F"]:null;
   return `<div class="face" style="--c:${p.c};--on:${p.on};--band:${p.band};--bandon:${p.bandon};--ns:${nameSize(c.nome)}">
     <div class="band"><span class="slot"></span><p class="cname"><span>${esc(c.nome||"Sem nome")}</span></p></div>
     <div class="win">${ph?`<img data-for="${esc(c.id)}" class="${ph.raw?"raw":""}" src="${ph.src}" alt="" draggable="false"${imgTf(c)}>`:SIL}
-      ${cs&&c.status!=="desejo"?`<span class="cons">${cs[1]}</span>`:""}${stick?`<span class="sticker" style="--sc:${stick[1]}">${stick[0]}</span>`:""}${tag?`<span class="ptag" style="--sc:${tag[1]}">${tag[0]}</span>`:""}</div>
+      ${full&&cs&&c.status!=="desejo"?`<span class="cons">${cs[1]}</span>`:""}${!full&&et?`<span class="etq" role="button" tabindex="0" style="--sc:${et[1]}" aria-label="Status: ${et[0]}"><span>${et[0]}</span></span>`:""}${stick?`<span class="sticker" style="--sc:${stick[1]}">${stick[0]}</span>`:""}${tag?`<span class="ptag" style="--sc:${tag[1]}">${tag[0]}</span>`:""}</div>
     <div class="info"><span class="year${c.ano?"":" none"}">${esc(c.ano||"Ano?")}</span><div class="mk"><b>${esc(brandOf(c))}</b><span>${idOf(c)}</span></div></div>
   </div>`;
 }
@@ -618,7 +637,7 @@ function renderFilters(){
   pr.setAttribute("aria-valuenow",fHue??0);
   $("#pAll").setAttribute("aria-pressed",fHue==null&&!fNeutral);$("#pNeu").setAttribute("aria-pressed",fNeutral);
   $("#statusRow").hidden=route==="wishlist";
-  const st=[["todos","Todos"],["detalhar","Será detalhado"],["reformar","Será reformado"],["reformado","Reformado"],["nao-reformar","Não será reformado"]];
+  const st=[["todos","Todos"],["detalhar","Detalhar"],["reformar","Reformar"],["reformado","Reformado"]];
   $("#status").innerHTML=st.map(([v,l])=>`<button class="chip" data-st="${v}" aria-pressed="${fStatus===v}">${l}</button>`).join("");
   $("#fOn").hidden=!(fHue!=null||fNeutral||fStatus!=="todos"||$("#q").value.trim());
 }
@@ -658,7 +677,9 @@ let sortMode=["num","recente","ano"].includes(pref("neon-sort"))?pref("neon-sort
 function syncSort(){$("#sortbar").querySelectorAll("[data-sort]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.sort===sortMode))}
 $("#sortbar").onclick=e=>{const b=e.target.closest("[data-sort]");if(!b)return;sortMode=b.dataset.sort;pref("neon-sort",sortMode);syncSort();render()};
 syncSort();
-$("#wall").onclick=e=>{if(e.target.closest("[data-add]"))return openForm(null);const c=e.target.closest("[data-id]");if(c)hold(cars.find(x=>x.id===c.dataset.id),c)};
+function toggleEtq(t){const open=!t.classList.contains("open");document.querySelectorAll(".etq.open").forEach(x=>x.classList.remove("open"));if(open){t.classList.add("open");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("open"),2500)}}
+$("#wall").addEventListener("keydown",e=>{const t=e.target.closest&&e.target.closest(".etq");if(t&&(e.key==="Enter"||e.key===" ")){e.preventDefault();e.stopPropagation();toggleEtq(t)}},true);
+$("#wall").onclick=e=>{const et=e.target.closest(".etq");if(et){e.stopPropagation();toggleEtq(et);return}if(e.target.closest("[data-add]"))return openForm(null);const c=e.target.closest("[data-id]");if(c)hold(cars.find(x=>x.id===c.dataset.id),c)};
 
 /* ---------- cartela na mão ---------- */
 let holding=null;
@@ -671,12 +692,11 @@ function hold(c,from){
 }
 function closeHeld(){$("#heldOv").hidden=true;holding=null}
 $("#hClose").onclick=closeHeld;$("#hEdit").onclick=()=>openForm(holding);
-$("#hBuy").onclick=async()=>{const c=holding;if(!c)return;try{const num=nextNum();await store.save(c.id,{...c,num,status:"nao-reformar",conservacao:c.conservacao||"lacrado",desde:new Date().toISOString().slice(0,10),criado:Date.now()});closeHeld();toast("MINI-"+pad(num)+" foi para a parede")}catch(_){toast("Não deu para salvar agora")}};
+$("#hBuy").onclick=async()=>{const c=holding;if(!c)return;try{const num=nextNum();await store.save(c.id,{...c,num,status:"",conservacao:c.conservacao||"lacrado",desde:new Date().toISOString().slice(0,10),criado:Date.now()});closeHeld();toast("MINI-"+pad(num)+" foi para a parede")}catch(_){toast("Não deu para salvar agora")}};
 $("#heldOv").addEventListener("click",e=>{if(e.target.id==="heldOv"||e.target.classList.contains("held")||e.target.id==="pair")closeHeld()});
 
 /* ---------- formulário ---------- */
-let editing=null,photo="",photoEnq=0,sel={hex:"",cor:"",status:"nao-reformar",cons:"novo",where:"colecao"},adj={fz:1,fx:0,fy:0};
-$("#fTipo").innerHTML=`<option value="">Escolha</option>`+TIPOS.map(t=>`<option>${t}</option>`).join("");
+let editing=null,photo="",photoEnq=0,sel={hex:"",cor:"",status:"",cons:"novo",where:"colecao"},adj={fz:1,fx:0,fy:0};
 $("#fCor").innerHTML=Object.entries(CORES).map(([n,h])=>`<button type="button" data-v="${h}" style="--c:${h}" title="${n}" aria-label="${n}"></button>`).join("");
 $("#fStatus").innerHTML=STATUS.map(([v,l])=>`<button type="button" data-v="${v}">${l}</button>`).join("");
 $("#fCons").innerHTML=CONS.map(([v,l])=>`<button type="button" data-v="${v}">${l}</button>`).join("");
@@ -687,7 +707,7 @@ function syncSeg(){[["#fStatus","status"],["#fCons","cons"],["#fWhere","where"]]
   $("#fDesde").previousElementSibling.textContent=w?"Na wishlist desde":"Incluído em";
   if(!editing)$("#save").textContent=w?"Pôr na wishlist":"Pendurar na parede"}
 $("#fWhere").onclick=e=>{const b=e.target.closest("button");if(!b)return;sel.where=b.dataset.v;syncSeg()};
-$("#fStatus").onclick=e=>{const b=e.target.closest("button");if(!b)return;sel.status=b.dataset.v;syncSeg()};
+$("#fStatus").onclick=e=>{const b=e.target.closest("button");if(!b)return;sel.status=sel.status===b.dataset.v?"":b.dataset.v;syncSeg()};
 $("#fCons").onclick=e=>{const b=e.target.closest("button");if(!b)return;sel.cons=b.dataset.v;syncSeg()};
 $("#fCor").onclick=e=>{const b=e.target.closest("button");if(b)setHex(b.dataset.v)};
 $("#fHex").oninput=e=>setHex(e.target.value);
@@ -705,7 +725,7 @@ function openForm(c){
   $("#fNome").value=c?.nome||"";$("#fMarca").value=c?.marca||(b&&b!=="Sem marca"?b:"");$("#fSerie").value=c?.serie||"";$("#fAno").value=c?.ano||"";$("#fTipo").value=c?.tipo||"";
   $("#fDesde").value=c?.desde||new Date().toISOString().slice(0,10);
   adj={fz:+(c&&c.fz)||1,fx:+(c&&c.fx)||0,fy:+(c&&c.fy)||0};
-  sel={where:c?(isWish(c)?"desejo":"colecao"):(route==="wishlist"?"desejo":"colecao"),hex:"",cor:"",status:c&&!isWish(c)?stOf(c):"nao-reformar",cons:c?.conservacao||"novo"};setHex(c?baseHex(c):"");syncSeg();
+  sel={where:c?(isWish(c)?"desejo":"colecao"):(route==="wishlist"?"desejo":"colecao"),hex:"",cor:"",status:c&&!isWish(c)?stOf(c):"",cons:c?.conservacao||"novo"};setHex(c?baseHex(c):"");syncSeg();
   const ph=c?photoOf(c):null;photoEnq=ph&&!ph.raw?3:0;setPhoto(ph?ph.src:"");$("#fPhoto").value="";$("#aiText").value="";aiMsg("");
   const del=$("#del");del.hidden=!c;del.classList.remove("confirm");del.textContent="Excluir";
   $("#save").textContent=c?"Salvar ficha":sel.where==="desejo"?"Pôr na wishlist":"Pendurar na parede";
@@ -737,7 +757,7 @@ $("#form").onsubmit=async e=>{
   const nome=$("#fNome").value.trim();if(!nome){$("#fNome").focus();aiMsg("Dê um nome ao carrinho antes de salvar.",true);return}
   const wish=sel.where==="desejo";
   const data={nome,marca:$("#fMarca").value.trim(),serie:$("#fSerie").value.trim(),ano:$("#fAno").value.trim(),tipo:$("#fTipo").value,desde:$("#fDesde").value,hex:sel.hex,cor:sel.cor,status:wish?"desejo":sel.status,conservacao:sel.cons,foto:photo,enq:photo?photoEnq:0,fz:adj.fz,fx:adj.fx,fy:adj.fy,exemplo:false};
-  addToLists(data.marca,data.serie);
+  addToLists(data.marca,data.serie,data.tipo);
   const btn=$("#save");btn.disabled=true;btn.textContent="Salvando…";
   try{
     if(editing){
@@ -756,10 +776,11 @@ function aiMsg(m,err){const el=$("#aiMsg");el.textContent=m;el.classList.toggle(
 /* ---------- marcas e séries cadastradas ---------- */
 const DEF_MARCAS=["Hot Wheels","Matchbox","Majorette","Maisto"];
 let listas=null,listasSave=null;
-function seedListas(){const m=new Set(DEF_MARCAS),s=[];for(const c of cars){if(c.marca)m.add(c.marca);if(c.serie&&!s.some(x=>x.m===(c.marca||"")&&x.s===c.serie))s.push({m:c.marca||"",s:c.serie})}return {marcas:[...m],series:s}}
-function getListas(){if(!listas)listas=seedListas();return listas}
+function seedTipos(){const t=new Set(TIPOS);for(const c of cars)if(c.tipo)t.add(c.tipo);return [...t]}
+function seedListas(){const m=new Set(DEF_MARCAS),s=[];for(const c of cars){if(c.marca)m.add(c.marca);if(c.serie&&!s.some(x=>x.m===(c.marca||"")&&x.s===c.serie))s.push({m:c.marca||"",s:c.serie})}return {marcas:[...m],series:s,tipos:seedTipos()}}
+function getListas(){if(!listas)listas=seedListas();if(!Array.isArray(listas.tipos))listas.tipos=seedTipos();return listas}
 function persistListas(){try{listasSave&&listasSave(listas)}catch(_){}}
-function addToLists(m,se){const L=getListas();let ch=false;if(m&&!L.marcas.some(x=>x.toLowerCase()===m.toLowerCase())){L.marcas.push(m);ch=true}
+function addToLists(m,se,tp){const L=getListas();let ch=false;if(tp&&!L.tipos.some(x=>x.toLowerCase()===tp.toLowerCase())){L.tipos.push(tp);ch=true}if(m&&!L.marcas.some(x=>x.toLowerCase()===m.toLowerCase())){L.marcas.push(m);ch=true}
   if(se&&!L.series.some(x=>x.m.toLowerCase()===(m||"").toLowerCase()&&x.s.toLowerCase()===se.toLowerCase())){L.series.push({m:m||"",s:se});ch=true}if(ch)persistListas()}
 function renderLists(){
   const L=getListas(),cm=$("#fMarca").value.trim(),cs=$("#fSerie").value.trim(),lo=x=>String(x||"").toLowerCase();
@@ -767,15 +788,23 @@ function renderLists(){
   $("#fMarcaSel").innerHTML=`<option value="">Escolha a marca</option>`+marcas.map(m=>`<option value="${esc(m)}"${lo(m)===lo(cm)?" selected":""}>${esc(m)}</option>`).join("")+`<option value="__nova">+ Adicionar nova marca…</option>`;
   const series=L.series.filter(x=>!cm||lo(x.m)===lo(cm)).map(x=>x.s);if(cs&&!series.some(x=>lo(x)===lo(cs)))series.push(cs);
   $("#fSerieSel").innerHTML=`<option value="">${series.length?"Escolha a série":"Nenhuma série ainda"}</option>`+series.map(x=>`<option value="${esc(x)}"${lo(x)===lo(cs)?" selected":""}>${esc(x)}</option>`).join("")+`<option value="__nova">+ Adicionar nova série…</option>`;
-  ["#mDel","#sDel"].forEach(id=>{const b=$(id);b.classList.remove("confirm");b.innerHTML=TRASH});
+  const ct=$("#fTipo").value.trim(),tipos=[...L.tipos];if(ct&&!tipos.some(x=>lo(x)===lo(ct)))tipos.push(ct);
+  $("#fTipoSel").innerHTML=`<option value="">Escolha o tipo</option>`+tipos.map(x=>`<option value="${esc(x)}"${lo(x)===lo(ct)?" selected":""}>${esc(x)}</option>`).join("")+`<option value="__nova">+ Adicionar novo tipo…</option>`;
+  ["#mDel","#sDel","#tDel"].forEach(id=>{const b=$(id);b.classList.remove("confirm");b.innerHTML=TRASH});
 }
 const TRASH=$("#mDel").innerHTML;
-function pickNew(kind,on){$(kind==="m"?"#mNew":"#sNew").hidden=!on;if(on){const i=$(kind==="m"?"#newM":"#newS");i.value="";i.focus()}}
+function pickNew(kind,on){const box={m:"#mNew",s:"#sNew",t:"#tNew"}[kind],inp={m:"#newM",s:"#newS",t:"#newT"}[kind];$(box).hidden=!on;if(on){const i=$(inp);i.value="";i.focus()}}
 $("#fMarcaSel").onchange=e=>{const v=e.target.value;if(v==="__nova"){pickNew("m",true);renderLists();return}pickNew("m",false);$("#fMarca").value=v;
   const L=getListas();if($("#fSerie").value&&!L.series.some(x=>x.m.toLowerCase()===v.toLowerCase()&&x.s.toLowerCase()===$("#fSerie").value.toLowerCase()))$("#fSerie").value="";renderLists()};
 $("#fSerieSel").onchange=e=>{const v=e.target.value;if(v==="__nova"){pickNew("s",true);renderLists();return}pickNew("s",false);$("#fSerie").value=v;renderLists()};
 $("#addM").onclick=()=>{const v=$("#newM").value.trim();if(!v){$("#newM").focus();return}addToLists(v,"");$("#fMarca").value=v;$("#fSerie").value="";pickNew("m",false);renderLists();toast(`${v} adicionada`)};
 $("#addS").onclick=()=>{const v=$("#newS").value.trim();if(!v){$("#newS").focus();return}addToLists($("#fMarca").value.trim(),v);$("#fSerie").value=v;pickNew("s",false);renderLists();toast(`${v} adicionada`)};
+$("#fTipoSel").onchange=e=>{const v=e.target.value;if(v==="__nova"){pickNew("t",true);renderLists();return}pickNew("t",false);$("#fTipo").value=v;renderLists()};
+$("#addT").onclick=()=>{const v=$("#newT").value.trim();if(!v){$("#newT").focus();return}addToLists("","",v);$("#fTipo").value=v;pickNew("t",false);renderLists();toast(`${v} adicionado`)};
+$("#cancelT").onclick=()=>pickNew("t",false);
+$("#newT").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#addT").click()}});
+$("#tDel").onclick=()=>{const v=$("#fTipo").value.trim();if(!v){toast("Escolha um tipo na lista para excluir");return}
+  delConfirm($("#tDel"),()=>{const L=getListas();L.tipos=L.tipos.filter(x=>x.toLowerCase()!==v.toLowerCase());persistListas();$("#fTipo").value="";renderLists();toast(`${v} excluído da lista`)})};
 $("#cancelM").onclick=()=>pickNew("m",false);$("#cancelS").onclick=()=>pickNew("s",false);
 $("#newM").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#addM").click()}});
 $("#newS").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#addS").click()}});
@@ -799,13 +828,13 @@ const AI_RULES=`Você ajuda a catalogar miniaturas colecionáveis de carros (Hot
 Responda SOMENTE com um objeto JSON com estas chaves:
 "nome" (nome do modelo), "marca", "serie" (série ou linha da miniatura), "ano" (ano de lançamento da miniatura, 4 dígitos),
 "cor" (cor predominante, uma destas: ${Object.keys(CORES).join(", ")}), "tipo" (um destes: ${TIPOS.join(", ")}),
-"status" (um destes: detalhar, reformar, reformado, nao-reformar, desejo; "vou detalhar" é detalhar, "vou reformar" é reformar, "já reformei" ou "reformado" é reformado, "quero comprar" é desejo), "conservacao" (um destes: lacrado, novo, usado, desgastado), "desde" (data, AAAA-MM-DD).
+"status" (um destes: detalhar, reformar, reformado, desejo, ou null se nada foi dito; "vou detalhar" é detalhar, "vou reformar" é reformar, "já reformei" ou "reformado" é reformado, "quero comprar" é desejo), "conservacao" (um destes: lacrado, novo, usado, desgastado), "desde" (data, AAAA-MM-DD).
 Use null em qualquer chave que você não saiba ou que não foi dita. Não invente série ou ano sem confiança razoável. Hoje é ${new Date().toISOString().slice(0,10)}.`;
 function applyAI(r){
   if(!r||typeof r!=="object")return 0;let n=0;
   const put=(id,v)=>{if(v==null||v==="")return;const el=$(id);el.value=v;el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash");n++};
   put("#fNome",r.nome);put("#fMarca",r.marca);put("#fSerie",r.serie);if(r.ano)put("#fAno",String(r.ano).slice(0,4));
-  if(TIPOS.includes(r.tipo))put("#fTipo",r.tipo);if(r.desde&&/^\d{4}-\d{2}-\d{2}$/.test(r.desde))put("#fDesde",r.desde);
+  if(r.tipo&&typeof r.tipo==="string"){const t=getListas().tipos.find(x=>x.toLowerCase()===r.tipo.toLowerCase());put("#fTipo",t||r.tipo)}if(r.desde&&/^\d{4}-\d{2}-\d{2}$/.test(r.desde))put("#fDesde",r.desde);
   if(CORES[r.cor]&&!sel.hex){setHex(CORES[r.cor]);n++}
   if(r.status==="desejo"){sel.where="desejo";n++}else if(STATUS.some(s=>s[0]===r.status)){sel.status=r.status;n++}if(CONS.some(s=>s[0]===r.conservacao)){sel.cons=r.conservacao;n++}
   syncSeg();renderLists();return n;
@@ -948,6 +977,7 @@ async function linkConexao(atual){
   let locais=0;try{locais=(await openIdb().all()).length}catch(_){}
   await conectar(n,locais>0);toast("Aparelho conectado à coleção");return true;
 }
+$("#dMore").onclick=()=>{const o=$("#dOpts"),open=o.hidden;o.hidden=!open;$("#dMore").setAttribute("aria-expanded",open)};
 $("#syncSwap").onclick=()=>{closeDrawer();openSync("trocar")};
 $("#bExport").onclick=()=>{const blob=new Blob([JSON.stringify({app:"colecao-neon",versao:2,carros:cars,listas:getListas()})],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`colecao-neon-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();toast("Cópia salva")};
 $("#importFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.listas&&d.listas.marcas){listas=d.listas;persistListas()}await store.importAll(d.carros||[]);toast(`${(d.carros||[]).length} cartelas restauradas`)}catch(_){toast("Esse arquivo não é uma cópia da Coleção Neon")}e.target.value=""};
